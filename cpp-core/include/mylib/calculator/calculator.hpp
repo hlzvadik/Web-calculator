@@ -1,7 +1,7 @@
 #ifndef CALCULATOR_HPP
 #define CALCULATOR_HPP
 #include <string>
-#include "mylib/queue/myqueue.hpp"
+#include "../queue/myqueue.hpp"
 
 namespace goltsov
 {

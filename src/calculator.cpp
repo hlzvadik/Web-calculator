@@ -1,10 +1,10 @@
 #include <iostream>
 #include <string>
 #include <cstring>
-#include "../include/mylib/calculator/calculator.hpp"
-#include "../include/mylib/queue/myqueue.hpp"
-#include "../include/mylib/stack/mystack.hpp"
-#include "../include/mylib/calculator/mathoperations/mathoperations.hpp"
+#include "../cpp-core/include/mylib/calculator/calculator.hpp"
+#include "../cpp-core/include/mylib/queue/myqueue.hpp"
+#include "../cpp-core/include/mylib/stack/mystack.hpp"
+#include "../cpp-core/include/mylib/calculator/mathoperations/mathoperations.hpp"
 
 namespace goltsov
 {

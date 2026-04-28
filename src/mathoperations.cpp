@@ -1,6 +1,6 @@
 #include <limits>
-#include "../include/mylib/calculator/mathoperations/mathoperations.hpp"
 #include <iostream>
+#include "../cpp-core/include/mylib/calculator/mathoperations/mathoperations.hpp"
 
 namespace goltsov
 {
