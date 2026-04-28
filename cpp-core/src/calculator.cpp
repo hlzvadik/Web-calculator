@@ -116,7 +116,7 @@ namespace goltsov
     return res;
   }
 
-  lli eval(goltsov::Queue< std::string > postfix)
+  lli solve(goltsov::Queue< std::string > postfix)
   {
     goltsov::Stack< lli > result;
     while (!postfix.empty())
@@ -174,5 +174,111 @@ namespace goltsov
       }
     }
     return result.front();
+  }
+
+  goltsov::Queue< std::string > parsing(std::string example)
+  {
+    goltsov::Queue< std::string > inf;
+    std::string numb = "";
+    char prev = ' ';
+    for (size_t i = 0; i < example.size(); ++i)
+    {
+      if (example[i] == ' ')
+      {
+        if (prev == ' ')
+        {
+          continue;
+        }
+        else
+        {
+          if (isdigit(prev))
+          {
+            inf.push(numb);
+            numb = "";
+            prev = ' ';
+          }
+        }
+      }
+      else if (isdigit(example[i]))
+      {
+        if (!inf.empty() && isdigit(inf.back()))
+        {
+          throw std::logic_error("Bad input expression");
+        }
+        numb += example[i];
+        prev = example[i];
+      }
+      else if (example[i] == ")")
+      {
+        if (numb.size())
+        {
+          inf.push(numb);
+          numb = "";
+        }
+        inf.push(example[i]);
+        prev = example[i];
+      }
+      else if (example[i] == "(")
+      {
+        if (numb.size())
+        {
+          inf.push(numb);
+          numb = "";
+          inf.push("*");
+        }
+        inf.push(example[i]);
+        prev = example[i];
+      }
+      else if (exmple[i] == '-' or exmple[i] == '+')
+      {
+        if (isdigit(prev))
+        {
+          inf.push(numb);
+          numb = "";
+          inf.push(example[i]);
+          prev = example[i];
+        }
+        else if (inf.empty() || inf.back() == "(")
+        {
+          inf.push("0");
+          inf.push(example[i]);
+          prev = example[i];
+        }
+        else if (inf.back == ")")
+        {
+          inf.push(example[i]);
+          prev = example[i];
+        }
+        else
+        {
+          throw std::logic_error("Bad input expression");
+        }
+      }
+      else
+      {
+        if (isdigit(prev))
+        {
+          inf.push(numb);
+          numb = "";
+          inf.push(example[i]);
+          prev = example[i];
+        }
+        else if (inf.back == ")")
+        {
+          inf.push(example[i]);
+          prev = example[i];
+        }
+        else
+        {
+          throw std::logic_error("Bad input expression");
+        }
+      }
+    }
+    return inf;
+  }
+
+  lli eval(goltsov::Queue< std::string > inf)
+  {
+    return solve(converToPostfix(inf));
   }
 }
