@@ -1,6 +1,6 @@
 #ifndef MYSTACK_HPP
 #define MYSTACK_HPP
-#include "../list/mylist.hpp"
+#include "mylib/list/mylist.hpp"
 
 namespace goltsov
 {

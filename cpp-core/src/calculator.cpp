@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <cstring>
 #include "../include/mylib/calculator/calculator.hpp"
 #include "../include/mylib/queue/myqueue.hpp"
 #include "../include/mylib/stack/mystack.hpp"
@@ -62,7 +63,7 @@ namespace goltsov
         {
           throw std::logic_error("Bad input expression");
         }
-        while(op_and_br.front() != "(" && !op_and_br.empty())
+        while(!op_and_br.empty() && op_and_br.front() != "(")
         {
           postfix.push(op_and_br.front());
           op_and_br.drop();
@@ -102,7 +103,6 @@ namespace goltsov
       postfix.push(op_and_br.front());
       op_and_br.drop();
     }
-
     return postfix;
   }
 
@@ -197,56 +197,64 @@ namespace goltsov
             numb = "";
             prev = ' ';
           }
+          else
+          {
+            prev = ' ';
+          }
         }
       }
       else if (isdigit(example[i]))
       {
-        if (!inf.empty() && isdigit(inf.back()))
+        if (!inf.empty() && isdigit(inf.back()[0]))
         {
           throw std::logic_error("Bad input expression");
         }
         numb += example[i];
         prev = example[i];
       }
-      else if (example[i] == ")")
-      {
-        if (numb.size())
-        {
-          inf.push(numb);
-          numb = "";
-        }
-        inf.push(example[i]);
-        prev = example[i];
-      }
-      else if (example[i] == "(")
-      {
-        if (numb.size())
-        {
-          inf.push(numb);
-          numb = "";
-          inf.push("*");
-        }
-        inf.push(example[i]);
-        prev = example[i];
-      }
-      else if (exmple[i] == '-' or exmple[i] == '+')
+      else if (example[i] == ')')
       {
         if (isdigit(prev))
         {
           inf.push(numb);
           numb = "";
-          inf.push(example[i]);
+        }
+        inf.push(std::string(1, example[i]));
+        prev = example[i];
+      }
+      else if (example[i] == '(')
+      {
+        if (isdigit(prev))
+        {
+          inf.push(numb);
+          numb = "";
+          inf.push("*");
+        }
+        else if (isdigit(inf.back()[0]) || inf.back() == ")")
+        {
+          inf.push("*");
+        }
+        inf.push(std::string(1, example[i]));
+        prev = example[i];
+      }
+      else if (example[i] == '-' or example[i] == '+')
+      {
+        if (isdigit(prev))
+        {
+          inf.push(numb);
+          numb = "";
+          inf.push(std::string(1, example[i]));
           prev = example[i];
         }
         else if (inf.empty() || inf.back() == "(")
         {
           inf.push("0");
-          inf.push(example[i]);
+          inf.push(std::string(1, example[i]));
           prev = example[i];
         }
-        else if (inf.back == ")")
+        else if (inf.back() == ")" || prev == ' ')
         {
-          inf.push(example[i]);
+          inf.push(std::string(1, example[i]));
           prev = example[i];
         }
         else
@@ -260,12 +268,12 @@ namespace goltsov
         {
           inf.push(numb);
           numb = "";
-          inf.push(example[i]);
+          inf.push(std::string(1, example[i]));
           prev = example[i];
         }
-        else if (inf.back == ")")
+        else if (inf.back() == ")" || prev == ' ')
         {
-          inf.push(example[i]);
+          inf.push(std::string(1, example[i]));
           prev = example[i];
         }
         else
@@ -274,11 +282,15 @@ namespace goltsov
         }
       }
     }
+    if (numb.size())
+    {
+      inf.push(numb);
+    }
     return inf;
   }
 
-  lli eval(goltsov::Queue< std::string > inf)
+  lli eval(std::string example)
   {
-    return solve(converToPostfix(inf));
+    return solve(converToPostfix(parsing(example)));
   }
 }

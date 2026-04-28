@@ -1,6 +1,6 @@
 #ifndef MYQUEUE_HPP
 #define MYQUEUE_HPP
-#include "../list/mylist.hpp"
+#include "mylib/list/mylist.hpp"
 
 namespace goltsov
 {
