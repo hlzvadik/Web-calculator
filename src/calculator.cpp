@@ -59,7 +59,7 @@ namespace goltsov
       }
       else if (a.front() == ")")
       {
-        if ((prev != " " && !isdigit(prev[0])) || prev == "(")
+        if ((prev != " " && !isdigit(prev[0])) && prev != ")" || prev == "(")
         {
           throw std::logic_error("Bad input expression");
         }
@@ -230,7 +230,7 @@ namespace goltsov
           numb = "";
           inf.push("*");
         }
-        else if (isdigit(inf.back()[0]) || inf.back() == ")")
+        else if (!inf.empty() && (isdigit(inf.back()[0]) || inf.back() == ")"))
         {
           inf.push("*");
         }
