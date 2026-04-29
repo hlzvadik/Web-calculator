@@ -2,3 +2,5 @@ fastapi
 uvicorn
 pydantic
 email-validator
+asyncpg
+psycopg2
