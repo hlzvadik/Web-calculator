@@ -4,3 +4,7 @@ pydantic
 email-validator
 asyncpg
 psycopg2
+jwt
+bcrypt
+status
+python-multipart

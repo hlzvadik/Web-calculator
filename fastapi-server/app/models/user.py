@@ -9,20 +9,20 @@ class User(BaseModel):
 class PostUser(BaseModel):
     name: str = ""
     email: EmailStr
-    hash_password: str
+    password: str
 
 class GetUser(BaseModel):
     email: EmailStr
-    hash_password: str
+    password: str
 
 class PatchUser(BaseModel):
     name: str = ""
     email: EmailStr
-    hash_password: str
+    password: str
 
 class DeleteUser(BaseModel):
     email: EmailStr
-    hash_password: str
+    password: str
 
 class ResponceUser(BaseModel):
     name: str = ""
