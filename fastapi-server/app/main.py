@@ -39,13 +39,6 @@ async def protected_route(current: str = Depends(get_user_from_token), db: async
 
     return {"message": f"Hello {res['name']}, you are authenticated!"}
 
-@app.get('/eval')
-async def solving_expression(expression: str = ""):
-    if (len(expression) == 0):
-        return {"result": 0}
-    else:
-        return {"result": cm.eval(expression)}
-
 @app.post('/create_user')
 async def create_user(new_user: s_u.PostUser, db: asyncpg.Connection = Depends(get_db_connection)):
     hashed_password = hash_password(new_user.password)
@@ -102,6 +95,64 @@ async def change_name(new_name_user: s_u.PatchUser, db: asyncpg.Connection = Dep
     
     return {"message": "Username changed succesfully"}
 
+@app.get('/eval')
+async def solving_expression(expression: str = "", current: str = Depends(get_user_from_token), db: asyncpg.Connection = Depends(get_db_connection)):
+    if (len(expression) == 0):
+        return {"result": 0}
+    else:
+        result = cm.eval(expression)
+        if current is not None:
+            row = await db.fetchrow('''
+                SELECT id FROM users WHERE email = $1
+            ''', current)
+            if row:
+                await db.execute('''
+                    INSERT INTO history (user_id, expression, answer) VALUES
+                    ($1, $2, $3)
+                ''', row['id'], expression, str(result))
+        return {"answer": result}
+
+@app.get('/history')
+async def get_history(current: str = Depends(get_user_from_token), db: asyncpg.Connection = Depends(get_db_connection)):
+    row = await db.fetchrow('''
+        SELECT id FROM users WHERE email = $1
+    ''', current)
+    if row:
+        result = await db.fetch('''
+            SELECT id, expression, answer FROM history WHERE user_id = $1
+        ''', row['id'])
+        return result
+    else:
+        raise HTTPException(status_code=404, detail="Not found")
+
+@app.delete('/delete_1_write')
+async def delete_1_write(id_expression: int, current: str = Depends(get_user_from_token), db: asyncpg.Connection = Depends(get_db_connection)):
+    row = await db.fetchrow('''
+        SELECT id FROM users WHERE email = $1
+    ''', current)
+    if row:
+        result = await db.execute('''
+            DELETE FROM history WHERE id = $1 AND user_id = $2
+        ''', id_expression, row["id"])
+        if result == "DELETE 0":
+            return {"message": "No such expression"}
+        else:
+            return {"message": "Deleted successfully"}
+    else:
+        raise HTTPException(status_code=404, detail="Not found")
+
+@app.delete('/delete_full_history')
+async def delete_full_history(current: str = Depends(get_user_from_token), db: asyncpg.Connection = Depends(get_db_connection)):
+    row = await db.fetchrow('''
+        SELECT id FROM users WHERE email = $1
+    ''', current)
+    if row:
+        result = await db.execute('''
+            DELETE FROM history WHERE user_id = $1
+        ''', row['id'])
+        return {"message": "History deleted successfully"}
+    else:
+        raise HTTPException(status_code=404, detail="Not found")
 
 if __name__ == "__main__":
     uvicorn.run(app)
