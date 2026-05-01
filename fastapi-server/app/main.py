@@ -24,14 +24,20 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends(), db: asyncpg.Co
             headers={"WWW-Authenticate": "Bearer"},
         )
     
-    token_data = {"sub": result["email"], "name": result["name"]}
+    token_data = {"sub": result["email"]}
     access_token = create_jwt_token(token_data)
 
-    return access_token
+    return {"access_token": access_token, "token_type": "bearer"}
 
 @app.get('/protected')
-async def protected_route(current_user: str = Depends(get_user_from_token)):
-    return {"message": f"Hello {current_user}, you are authenticated!"}
+async def protected_route(current: str = Depends(get_user_from_token), db: asyncpg.Connection = Depends(get_db_connection)):
+    res = await db.fetchrow('''
+        SELECT name FROM users WHERE email = $1
+    ''', current)
+    if not res:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    return {"message": f"Hello {res['name']}, you are authenticated!"}
 
 @app.get('/eval')
 async def solving_expression(expression: str = ""):
@@ -53,6 +59,7 @@ async def create_user(new_user: s_u.PostUser, db: asyncpg.Connection = Depends(g
 
 @app.delete('/delete_user')
 async def delete_user(user: s_u.DeleteUser, db: asyncpg.Connection = Depends(get_db_connection), current: str = Depends(get_user_from_token)):
+    print(current)
     if current != user.email:
         raise HTTPException(status_code=403, detail="Can only delete your own account")
     
